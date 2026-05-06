@@ -1,4 +1,4 @@
-import { Container } from 'pixi.js';
+import { Container, Sprite, Texture } from 'pixi.js';
 import { BaseScene } from './BaseScene';
 import { GameController } from '../core/GameController';
 import { GameModel } from '../core/GameModel';
@@ -7,6 +7,7 @@ import { ReelsView } from '../components/ReelsView';
 import { UIView } from '../components/UIView';
 import { WinView } from '../components/WinView';
 import { PaylineIndicators } from '../components/PaylineIndicators';
+import { FoxCharacter } from '../components/FoxCharacter';
 import { GAME_CONFIG } from '../config/GameConfig';
 
 export class GameScene extends BaseScene {
@@ -16,6 +17,7 @@ export class GameScene extends BaseScene {
   private uiView!: UIView;
   private winView!: WinView;
   private paylineIndicators!: PaylineIndicators;
+  private foxCharacter!: FoxCharacter;
 
   // Referências às camadas globais da Application
   public backgroundLayer: Container;
@@ -40,11 +42,21 @@ export class GameScene extends BaseScene {
   }
 
   public async init(): Promise<void> {
+    // ── Background ───────────────────────────────────────────────────────────
+    const bgSprite = new Sprite(Texture.from('assets/background.png'));
+    bgSprite.width = GAME_CONFIG.design.width;
+    bgSprite.height = GAME_CONFIG.design.height;
+    this.backgroundLayer.addChild(bgSprite);
+
+
     // ── Rolos ─────────────────────────────────────────────────────────────────
     this.reelsView = new ReelsView();
     this.reelsLayer.addChild(this.reelsView.container);
     this.maskLayer.addChild(this.reelsView.mask);
     this.reelsView.container.mask = this.reelsView.mask;
+
+    this.foxCharacter = new FoxCharacter();
+    this.reelsLayer.addChild(this.foxCharacter.container);
 
     // ── UI ────────────────────────────────────────────────────────────────────
     this.uiView = new UIView();
@@ -72,6 +84,7 @@ export class GameScene extends BaseScene {
     this.uiView?.destroy();
     this.winView?.destroy();
     this.paylineIndicators?.destroy();
+    this.foxCharacter?.destroy();
     this.backgroundLayer.removeChildren();
     this.reelsLayer.removeChildren();
     this.maskLayer.removeChildren();
@@ -104,7 +117,12 @@ export class GameScene extends BaseScene {
     const wins = this.controller.getLastWins();
     const totalWin = this.controller.getTotalWin();
     if (totalWin > 0) {
-      await this.winView.showWins(wins, totalWin, this.model.betPerLine);
+      await Promise.all([
+        this.winView.showWins(wins, totalWin, this.model.betPerLine),
+        this.foxCharacter.playWin(),
+      ]);
+    } else {
+      this.foxCharacter.playIdle();
     }
 
     this.uiView.setWin(totalWin);

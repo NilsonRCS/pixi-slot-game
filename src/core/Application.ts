@@ -1,4 +1,5 @@
 import { Application as PixiApp, Container } from 'pixi.js';
+import { GAME_CONFIG } from '../config/GameConfig';
 
 export class Application {
   private static instance: Application;
@@ -30,9 +31,12 @@ export class Application {
   }
 
   public async init(): Promise<void> {
+    const designW = GAME_CONFIG.design.width;
+    const designH = GAME_CONFIG.design.height;
+
     await this.app.init({
-      width: 1920,
-      height: 1080,
+      width: designW,
+      height: designH,
       backgroundColor: 0x1a1a2e,
       antialias: true,
       resolution: window.devicePixelRatio || 1,
@@ -52,19 +56,18 @@ export class Application {
   }
 
   private setupResize(): void {
+    const designW = GAME_CONFIG.design.width;
+    const designH = GAME_CONFIG.design.height;
+
     const resize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      const scaleX = width / 1920;
-      const scaleY = height / 1080;
-      const scale = Math.min(scaleX, scaleY);
 
       this.app.renderer.resize(width, height);
-      this.app.stage.scale.set(scale);
-      this.app.stage.position.set(
-        (width - 1920 * scale) / 2,
-        (height - 1080 * scale) / 2,
-      );
+
+      // Preenche 100% da viewport sem barras laterais.
+      this.app.stage.scale.set(width / designW, height / designH);
+      this.app.stage.position.set(0, 0);
     };
 
     window.addEventListener('resize', resize);

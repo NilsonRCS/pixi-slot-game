@@ -2,7 +2,6 @@ import { Assets } from 'pixi.js';
 
 // Mapa: chave de asset → frame estático (_00.png) de cada símbolo
 // Usado para exibição nos rolos (etapa 4).
-// Os frames de animação completos serão carregados na etapa de polish.
 const SYMBOL_BUNDLE: Record<string, string> = {
   bank:       'assets/sequences/symbols/Bank/Bank_00.png',
   safe:       'assets/sequences/symbols/Safe/Safe_00.png',
@@ -14,9 +13,12 @@ const SYMBOL_BUNDLE: Record<string, string> = {
   littera_k:  'assets/sequences/symbols/Littera_K/Littera_K_00.png',
   littera_q:  'assets/sequences/symbols/Littera_Q/Littera_Q_00.png',
   number_10:  'assets/sequences/symbols/Number_10/Number_10_00.png',
+  background: 'assets/background.png',
+  preloader:  'assets/preloader.png',
 };
 
 export type WinTier = 'big' | 'mega' | 'super' | 'total';
+export type CharacterAnim = 'idle' | 'win';
 
 const WIN_BASE_PATH: Record<WinTier, string> = {
   big: 'assets/sequences/wins/Big_Win/Big_Win',
@@ -26,6 +28,7 @@ const WIN_BASE_PATH: Record<WinTier, string> = {
 };
 
 const WIN_FRAME_COUNT = 46;
+const CHARACTER_FRAME_COUNT = 61;
 
 const buildWinFramePaths = (tier: WinTier): string[] =>
   Array.from({ length: WIN_FRAME_COUNT }, (_, i) =>
@@ -39,6 +42,21 @@ const WIN_SEQUENCE_PATHS: Record<WinTier, string[]> = {
   total: buildWinFramePaths('total'),
 };
 
+const CHARACTER_BASE_PATH: Record<CharacterAnim, string> = {
+  idle: 'assets/sequences/character/Idle/Idle',
+  win: 'assets/sequences/character/Win/Win',
+};
+
+const buildCharacterFramePaths = (anim: CharacterAnim): string[] =>
+  Array.from({ length: CHARACTER_FRAME_COUNT }, (_, i) =>
+    `${CHARACTER_BASE_PATH[anim]}_${String(i).padStart(2, '0')}.png`
+  );
+
+const CHARACTER_SEQUENCE_PATHS: Record<CharacterAnim, string[]> = {
+  idle: buildCharacterFramePaths('idle'),
+  win: buildCharacterFramePaths('win'),
+};
+
 export class AssetLoader {
   /**
    * Carrega todos os assets do jogo.
@@ -48,7 +66,7 @@ export class AssetLoader {
     Assets.addBundle('symbols', SYMBOL_BUNDLE);
     try {
       await Assets.loadBundle('symbols', onProgress);
-      await Assets.load(this.getAllWinFramePaths());
+      await Assets.load([...this.getAllWinFramePaths(), ...this.getAllCharacterFramePaths()]);
     } catch (err) {
       console.warn('[AssetLoader] Falha ao carregar alguns assets — usando fallback visual.', err);
     }
@@ -58,6 +76,10 @@ export class AssetLoader {
     return WIN_SEQUENCE_PATHS[tier];
   }
 
+  public static getCharacterFramePaths(anim: CharacterAnim): string[] {
+    return CHARACTER_SEQUENCE_PATHS[anim];
+  }
+
   private static getAllWinFramePaths(): string[] {
     return [
       ...WIN_SEQUENCE_PATHS.big,
@@ -65,5 +87,9 @@ export class AssetLoader {
       ...WIN_SEQUENCE_PATHS.super,
       ...WIN_SEQUENCE_PATHS.total,
     ];
+  }
+
+  private static getAllCharacterFramePaths(): string[] {
+    return [...CHARACTER_SEQUENCE_PATHS.idle, ...CHARACTER_SEQUENCE_PATHS.win];
   }
 }
