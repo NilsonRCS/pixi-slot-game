@@ -5,6 +5,8 @@ import { GameModel } from '../core/GameModel';
 import { Application } from '../core/Application';
 import { ReelsView } from '../components/ReelsView';
 import { UIView } from '../components/UIView';
+import { WinView } from '../components/WinView';
+import { PaylineIndicators } from '../components/PaylineIndicators';
 import { GAME_CONFIG } from '../config/GameConfig';
 
 export class GameScene extends BaseScene {
@@ -12,6 +14,8 @@ export class GameScene extends BaseScene {
   private controller: GameController;
   private reelsView!: ReelsView;
   private uiView!: UIView;
+  private winView!: WinView;
+  private paylineIndicators!: PaylineIndicators;
 
   // Referências às camadas globais da Application
   public backgroundLayer: Container;
@@ -46,8 +50,15 @@ export class GameScene extends BaseScene {
     this.uiView = new UIView();
     this.uiLayer.addChild(this.uiView.container);
 
+    this.winView = new WinView();
+    this.winLayer.addChild(this.winView.container);
+
+    this.paylineIndicators = new PaylineIndicators();
+    this.uiLayer.addChild(this.paylineIndicators.container);
+
     this.uiView.setBalance(this.model.balance);
-    this.uiView.setBet(this.model.bet);
+    this.uiView.setLance(this.model.totalBet);
+    this.uiView.setBet(this.model.betPerLine);
     this.uiView.setWin(0);
 
     this.uiView.onSpin(() => this.spin());
@@ -59,6 +70,8 @@ export class GameScene extends BaseScene {
   public destroy(): void {
     this.reelsView?.destroy();
     this.uiView?.destroy();
+    this.winView?.destroy();
+    this.paylineIndicators?.destroy();
     this.backgroundLayer.removeChildren();
     this.reelsLayer.removeChildren();
     this.maskLayer.removeChildren();
@@ -69,10 +82,11 @@ export class GameScene extends BaseScene {
   }
 
   private changeBet(delta: number): void {
-    const next = this.model.bet + delta;
+    const next = this.model.betPerLine + delta;
     if (next < GAME_CONFIG.bet.min || next > GAME_CONFIG.bet.max) return;
-    this.model.bet = next;
-    this.uiView.setBet(this.model.bet);
+    this.model.betPerLine = next;
+    this.uiView.setBet(this.model.betPerLine);
+    this.uiView.setLance(this.model.totalBet);
   }
 
   public async spin(): Promise<void> {
@@ -87,9 +101,15 @@ export class GameScene extends BaseScene {
       await this.reelsView.spin(this.model.lastResult);
     }
 
+    const wins = this.controller.getLastWins();
     const totalWin = this.controller.getTotalWin();
+    if (totalWin > 0) {
+      await this.winView.showWins(wins, totalWin, this.model.betPerLine);
+    }
+
     this.uiView.setWin(totalWin);
     this.uiView.setBalance(this.model.balance);
+    this.uiView.setLance(this.model.totalBet);
 
     this.controller.resolveWin();
     this.uiView.setSpinEnabled(true);

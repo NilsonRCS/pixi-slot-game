@@ -28,8 +28,8 @@ export class GameController {
     this.model.lastResult = result;
     this.model.isSpinning = false;
 
-    // Avalia ganhos
-    const wins = evaluateWins(result, this.model.bet);
+    // Avalia ganhos usando betPerLine como multiplicador base
+    const wins = evaluateWins(result, this.model.betPerLine);
     this.model.lastWins = wins;
 
     const totalPayout = wins.reduce((sum, w) => sum + w.payout, 0);

@@ -16,6 +16,29 @@ const SYMBOL_BUNDLE: Record<string, string> = {
   number_10:  'assets/sequences/symbols/Number_10/Number_10_00.png',
 };
 
+export type WinTier = 'big' | 'mega' | 'super' | 'total';
+
+const WIN_BASE_PATH: Record<WinTier, string> = {
+  big: 'assets/sequences/wins/Big_Win/Big_Win',
+  mega: 'assets/sequences/wins/Mega_Win/Mega_Win',
+  super: 'assets/sequences/wins/Super_MEga_Win/Super_Mega_Win',
+  total: 'assets/sequences/wins/Total_Win/Total_Win',
+};
+
+const WIN_FRAME_COUNT = 46;
+
+const buildWinFramePaths = (tier: WinTier): string[] =>
+  Array.from({ length: WIN_FRAME_COUNT }, (_, i) =>
+    `${WIN_BASE_PATH[tier]}_${String(i).padStart(2, '0')}.png`
+  );
+
+const WIN_SEQUENCE_PATHS: Record<WinTier, string[]> = {
+  big: buildWinFramePaths('big'),
+  mega: buildWinFramePaths('mega'),
+  super: buildWinFramePaths('super'),
+  total: buildWinFramePaths('total'),
+};
+
 export class AssetLoader {
   /**
    * Carrega todos os assets do jogo.
@@ -25,8 +48,22 @@ export class AssetLoader {
     Assets.addBundle('symbols', SYMBOL_BUNDLE);
     try {
       await Assets.loadBundle('symbols', onProgress);
+      await Assets.load(this.getAllWinFramePaths());
     } catch (err) {
       console.warn('[AssetLoader] Falha ao carregar alguns assets — usando fallback visual.', err);
     }
+  }
+
+  public static getWinFramePaths(tier: WinTier): string[] {
+    return WIN_SEQUENCE_PATHS[tier];
+  }
+
+  private static getAllWinFramePaths(): string[] {
+    return [
+      ...WIN_SEQUENCE_PATHS.big,
+      ...WIN_SEQUENCE_PATHS.mega,
+      ...WIN_SEQUENCE_PATHS.super,
+      ...WIN_SEQUENCE_PATHS.total,
+    ];
   }
 }

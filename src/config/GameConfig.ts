@@ -5,8 +5,8 @@ export const GAME_CONFIG = {
   },
 
   reels: {
-    count: 5,
-    rows: 3,
+    count: 6,
+    rows: 5,
     symbolSize: 150,
     spinDuration: 1500, // ms
     stopDelay: 200,     // ms entre cada reel parando
@@ -31,8 +31,9 @@ export const GAME_CONFIG = {
 
   bet: {
     min: 1,
-    max: 100,
+    max: 50,
     default: 1,
+    lines: 5, // paylines ativas (fixo)
   },
 
   balance: {

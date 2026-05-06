@@ -4,11 +4,11 @@ import { GAME_CONFIG } from '../config/GameConfig';
 
 const { count, rows, symbolSize, spinDuration, stopDelay } = GAME_CONFIG.reels;
 
-const GAP               = 10; // px entre reels
-const WINDOW_WIDTH      = count * symbolSize + (count - 1) * GAP;
-const WINDOW_HEIGHT     = rows * symbolSize;
-const ORIGIN_X          = (GAME_CONFIG.design.width  - WINDOW_WIDTH)  / 2;
-const ORIGIN_Y          = (GAME_CONFIG.design.height - WINDOW_HEIGHT) / 2;
+export const REELS_GAP = 10; // px entre reels
+export const REELS_WINDOW_WIDTH = count * symbolSize + (count - 1) * REELS_GAP;
+export const REELS_WINDOW_HEIGHT = rows * symbolSize;
+export const REELS_ORIGIN_X = (GAME_CONFIG.design.width - REELS_WINDOW_WIDTH) / 2;
+export const REELS_ORIGIN_Y = (GAME_CONFIG.design.height - REELS_WINDOW_HEIGHT) / 2;
 
 export class ReelsView {
   /** Container com todos os rolos — adicionar a reelsLayer */
@@ -32,14 +32,14 @@ export class ReelsView {
 
     // Máscara retangular da janela de símbolos
     this.mask = new Graphics();
-    this.mask.rect(ORIGIN_X, ORIGIN_Y, WINDOW_WIDTH, WINDOW_HEIGHT);
+    this.mask.rect(REELS_ORIGIN_X, REELS_ORIGIN_Y, REELS_WINDOW_WIDTH, REELS_WINDOW_HEIGHT);
     this.mask.fill({ color: 0xffffff });
 
     // Cria cada reel e posiciona lado a lado
     for (let i = 0; i < count; i++) {
       const reel = new Reel();
-      reel.container.x = ORIGIN_X + i * (symbolSize + GAP);
-      reel.container.y = ORIGIN_Y;
+      reel.container.x = REELS_ORIGIN_X + i * (symbolSize + REELS_GAP);
+      reel.container.y = REELS_ORIGIN_Y;
       this.container.addChild(reel.container);
       this.reels.push(reel);
     }
