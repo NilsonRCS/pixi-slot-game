@@ -13,8 +13,20 @@ export const GAME_CONFIG = {
   },
 
   symbols: {
-    count: 6,
-    names: ['cherry', 'lemon', 'orange', 'bell', 'bar', 'seven'],
+    count: 10,
+    // Ordem: maior → menor valor (reflete peso na paytable)
+    names: [
+      'bank',
+      'safe',
+      'cell',
+      'dynamit',
+      'handcuffs',
+      'littera_a',
+      'littera_j',
+      'littera_k',
+      'littera_q',
+      'number_10',
+    ] as const,
   },
 
   bet: {
@@ -27,3 +39,6 @@ export const GAME_CONFIG = {
     initial: 1000,
   },
 } as const;
+
+// Tipo helper — permite usar symbol name como string literal em outros módulos
+export type SymbolName = typeof GAME_CONFIG.symbols.names[number];

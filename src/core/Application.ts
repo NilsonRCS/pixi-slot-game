@@ -6,6 +6,7 @@ export class Application {
 
   public backgroundLayer: Container;
   public reelsLayer: Container;
+  public maskLayer: Container;
   public uiLayer: Container;
   public winLayer: Container;
   public overlayLayer: Container;
@@ -15,6 +16,7 @@ export class Application {
 
     this.backgroundLayer = new Container();
     this.reelsLayer = new Container();
+    this.maskLayer = new Container();
     this.uiLayer = new Container();
     this.winLayer = new Container();
     this.overlayLayer = new Container();
@@ -41,6 +43,7 @@ export class Application {
 
     this.app.stage.addChild(this.backgroundLayer);
     this.app.stage.addChild(this.reelsLayer);
+    this.app.stage.addChild(this.maskLayer);
     this.app.stage.addChild(this.uiLayer);
     this.app.stage.addChild(this.winLayer);
     this.app.stage.addChild(this.overlayLayer);

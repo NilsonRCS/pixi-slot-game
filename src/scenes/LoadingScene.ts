@@ -31,7 +31,7 @@ export class LoadingScene extends BaseScene {
     this.progressFill = new Graphics();
     this.container.addChild(this.progressFill);
 
-    await AssetLoader.load();
+    await AssetLoader.load((progress) => this.updateProgress(progress));
     this.updateProgress(1);
 
     setTimeout(() => this.onComplete(), 500);
