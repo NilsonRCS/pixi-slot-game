@@ -13,11 +13,12 @@ async function bootstrap(): Promise<void> {
     loadingScene.destroy();
 
     await gameScene.init();
-    app.reelsLayer.addChild(gameScene.container);
   });
 
-  await loadingScene.init();
+  // Adiciona ao stage ANTES de init() para que a tela de loading seja visível
+  // durante o carregamento dos assets
   app.overlayLayer.addChild(loadingScene.container);
+  await loadingScene.init();
 }
 
-bootstrap();
+bootstrap().catch((err) => console.error('[bootstrap] Erro fatal:', err));

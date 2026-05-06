@@ -23,6 +23,10 @@ export class AssetLoader {
    */
   public static async load(onProgress?: (progress: number) => void): Promise<void> {
     Assets.addBundle('symbols', SYMBOL_BUNDLE);
-    await Assets.loadBundle('symbols', onProgress);
+    try {
+      await Assets.loadBundle('symbols', onProgress);
+    } catch (err) {
+      console.warn('[AssetLoader] Falha ao carregar alguns assets — usando fallback visual.', err);
+    }
   }
 }

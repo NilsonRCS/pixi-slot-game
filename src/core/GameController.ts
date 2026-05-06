@@ -1,4 +1,7 @@
 import { GameModel } from './GameModel';
+import { evaluateWins } from '../config/PayTable';
+import type { WinResult } from '../config/PayTable';
+import { GAME_CONFIG } from '../config/GameConfig';
 
 export type GameState = 'idle' | 'spinning' | 'result' | 'win';
 
@@ -21,24 +24,41 @@ export class GameController {
     this.model.isSpinning = true;
     this.model.deductBet();
 
-    // Resultado simulado — substituir pela lógica real de paytable
     const result = this.generateResult();
     this.model.lastResult = result;
-
-    // A view será responsável por escutar e animar
-    // Aqui apenas registramos o estado ao concluir
     this.model.isSpinning = false;
-    this.state = 'result';
+
+    // Avalia ganhos
+    const wins = evaluateWins(result, this.model.bet);
+    this.model.lastWins = wins;
+
+    const totalPayout = wins.reduce((sum, w) => sum + w.payout, 0);
+    if (totalPayout > 0) {
+      this.model.addWin(totalPayout);
+      this.state = 'win';
+    } else {
+      this.state = 'result';
+    }
   }
 
   private generateResult(): number[][] {
-    const symbols = [0, 1, 2, 3, 4];
-    return Array.from({ length: 5 }, () =>
-      Array.from({ length: 3 }, () => symbols[Math.floor(Math.random() * symbols.length)])
+    const count = GAME_CONFIG.symbols.count;
+    return Array.from({ length: GAME_CONFIG.reels.count }, () =>
+      Array.from({ length: GAME_CONFIG.reels.rows }, () =>
+        Math.floor(Math.random() * count)
+      )
     );
   }
 
   public resolveWin(): void {
     this.state = 'idle';
+  }
+
+  public getLastWins(): WinResult[] {
+    return this.model.lastWins;
+  }
+
+  public getTotalWin(): number {
+    return this.model.lastWins.reduce((sum, w) => sum + w.payout, 0);
   }
 }
