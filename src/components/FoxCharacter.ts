@@ -1,6 +1,7 @@
 import { AnimatedSprite, Container, Texture } from 'pixi.js';
 import { AssetLoader } from '../core/AssetLoader';
 import { REELS_ORIGIN_X, REELS_ORIGIN_Y, REELS_WINDOW_HEIGHT, REELS_WINDOW_WIDTH } from './ReelsView';
+import { GAME_CONFIG } from '../config/GameConfig';
 
 export class FoxCharacter {
   public container: Container;
@@ -17,8 +18,11 @@ export class FoxCharacter {
 
     this.sprite = new AnimatedSprite(this.idleTextures);
     this.sprite.anchor.set(0.5, 1);
-    this.sprite.position.set(REELS_ORIGIN_X + REELS_WINDOW_WIDTH + 180, REELS_ORIGIN_Y + REELS_WINDOW_HEIGHT + 14);
-    this.sprite.scale.set(-0.74, 0.74); // espelhada para olhar para os reels
+    this.sprite.position.set(
+      REELS_ORIGIN_X + REELS_WINDOW_WIDTH + GAME_CONFIG.fox.offsetX,
+      REELS_ORIGIN_Y + REELS_WINDOW_HEIGHT + GAME_CONFIG.fox.offsetY
+    );
+    this.sprite.scale.set(GAME_CONFIG.fox.scaleX, GAME_CONFIG.fox.scaleY);
     this.sprite.animationSpeed = 0.28;
     this.sprite.loop = true;
     this.sprite.play();

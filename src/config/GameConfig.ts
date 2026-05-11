@@ -1,13 +1,13 @@
 export const GAME_CONFIG = {
   design: {
-    width: 1600,
-    height: 900,
+    width: 1920,
+    height: 1080,
   },
 
   reels: {
     count: 6,
     rows: 5,
-    symbolSize: 150,
+    symbolSize: 130,
     spinDuration: 1500, // ms
     stopDelay: 200,     // ms entre cada reel parando
   },
@@ -38,6 +38,13 @@ export const GAME_CONFIG = {
 
   balance: {
     initial: 1000,
+  },
+
+  fox: {
+    scaleX: -1.0,      // escala horizontal (negativo = espelhada)
+    scaleY: 0.7,       // escala vertical
+    offsetX: 250,     // distância horizontal do lado direito dos rolos
+    offsetY: 10,      // distância vertical do fundo dos rolos
   },
 } as const;
 
